@@ -1,5 +1,5 @@
 import { Response } from "express";
-import Project from "../models/Project"; // ✅ FIXED import
+import { Project } from "../models/Project"; // ✅ FIXED
 import { AuthRequest } from "../middleware/auth";
 
 // POST /api/projects
@@ -30,7 +30,9 @@ export async function createProject(req: AuthRequest, res: Response) {
       updatedAt: project.updatedAt,
     });
   } catch (err: any) {
-    return res.status(400).json({ error: err?.message || "Failed to create project" });
+    return res
+      .status(400)
+      .json({ error: err?.message || "Failed to create project" });
   }
 }
 
@@ -45,7 +47,7 @@ export async function getProjects(req: AuthRequest, res: Response) {
     }).sort({ updatedAt: -1 });
 
     return res.json(
-      projects.map((p) => ({
+      projects.map((p: any) => ({
         id: p._id.toString(),
         name: p.name,
         description: p.description,
@@ -56,7 +58,9 @@ export async function getProjects(req: AuthRequest, res: Response) {
       }))
     );
   } catch (err: any) {
-    return res.status(400).json({ error: err?.message || "Failed to fetch projects" });
+    return res
+      .status(400)
+      .json({ error: err?.message || "Failed to fetch projects" });
   }
 }
 
@@ -72,7 +76,10 @@ export async function getSingleProject(req: AuthRequest, res: Response) {
       $or: [{ owner: userId }, { members: userId }],
     });
 
-    if (!project) return res.status(404).json({ error: "Project not found or no access" });
+    if (!project)
+      return res
+        .status(404)
+        .json({ error: "Project not found or no access" });
 
     return res.json({
       id: project._id.toString(),
@@ -84,7 +91,9 @@ export async function getSingleProject(req: AuthRequest, res: Response) {
       updatedAt: project.updatedAt,
     });
   } catch (err: any) {
-    return res.status(400).json({ error: err?.message || "Failed to fetch project" });
+    return res
+      .status(400)
+      .json({ error: err?.message || "Failed to fetch project" });
   }
 }
 
@@ -103,7 +112,10 @@ export async function updateProject(req: AuthRequest, res: Response) {
       { new: true }
     );
 
-    if (!updated) return res.status(404).json({ error: "Project not found or no permission" });
+    if (!updated)
+      return res
+        .status(404)
+        .json({ error: "Project not found or no permission" });
 
     return res.json({
       id: updated._id.toString(),
@@ -115,7 +127,9 @@ export async function updateProject(req: AuthRequest, res: Response) {
       updatedAt: updated.updatedAt,
     });
   } catch (err: any) {
-    return res.status(400).json({ error: err?.message || "Failed to update project" });
+    return res
+      .status(400)
+      .json({ error: err?.message || "Failed to update project" });
   }
 }
 
@@ -129,12 +143,16 @@ export async function deleteProject(req: AuthRequest, res: Response) {
 
     const deleted = await Project.findOneAndDelete({ _id: id, owner: userId });
     if (!deleted) {
-      return res.status(404).json({ error: "Project not found or you are not the owner" });
+      return res.status(404).json({
+        error: "Project not found or you are not the owner",
+      });
     }
 
     return res.json({ ok: true });
   } catch (err: any) {
-    return res.status(400).json({ error: err?.message || "Failed to delete project" });
+    return res
+      .status(400)
+      .json({ error: err?.message || "Failed to delete project" });
   }
 }
 
@@ -154,7 +172,10 @@ export async function addMember(req: AuthRequest, res: Response) {
       { new: true }
     );
 
-    if (!updated) return res.status(404).json({ error: "Project not found or no permission" });
+    if (!updated)
+      return res
+        .status(404)
+        .json({ error: "Project not found or no permission" });
 
     return res.json({
       id: updated._id.toString(),
@@ -166,6 +187,8 @@ export async function addMember(req: AuthRequest, res: Response) {
       updatedAt: updated.updatedAt,
     });
   } catch (err: any) {
-    return res.status(400).json({ error: err?.message || "Failed to add member" });
+    return res
+      .status(400)
+      .json({ error: err?.message || "Failed to add member" });
   }
 }
