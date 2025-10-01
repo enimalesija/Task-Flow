@@ -1,5 +1,8 @@
 // src/utils/api.ts
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+
+// Always use VITE_API_URL from env in production
+// Fallback to localhost in dev
+const API_URL: string = import.meta.env.VITE_API_URL ?? "http://localhost:4000/api";
 
 // --- Helper: build headers with JWT ---
 function headers() {
@@ -102,7 +105,7 @@ export async function deleteProject(id: string) {
 }
 
 export async function addProjectMember(projectId: string, memberId: string) {
-  return post<any>("/projects/add-member", { projectId, memberId });
+  return post<any>(`/projects/${projectId}/add-member`, { memberId });
 }
 
 // ----------------------
