@@ -15,7 +15,6 @@
     "isolatedModules": true,
     "noEmit": true,
 
-    // 🔑 These two lines fix JSX errors
     "jsx": "react-jsx",
     "types": ["react", "react-dom"]
   },
