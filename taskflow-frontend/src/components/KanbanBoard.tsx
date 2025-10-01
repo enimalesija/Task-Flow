@@ -223,7 +223,7 @@ export default function KanbanBoard() {
   function ping(msg: string) {
     setToast(msg);
     window.clearTimeout((ping as any)._t);
-    (ping as any)._t = window.setTimeout(() => setToast(null), 1500);
+    (ping as any)._t = window.setTimeout(() => setToast(null), 4500);
   }
 
   // --- Guards ---
