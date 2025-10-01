@@ -1,17 +1,8 @@
-// Unified types for TaskFlow
+// src/types.ts
 
+// --- Task / Kanban types ---
 export type Status = "todo" | "inprogress" | "done";
 export type Priority = "high" | "medium" | "low";
-
-export interface Project {
-  id: string;
-  name: string;
-  description?: string;
-  owner: string;
-  members: string[];
-  createdAt: number;
-  updatedAt: number;
-}
 
 export interface Task {
   id: string;
@@ -20,15 +11,27 @@ export interface Task {
   description?: string;
   status: Status;
   priority: Priority;
-  dueDate?: number;
-  assignee?: string | { id?: string; name: string };
+  dueDate?: number; // timestamp (ms)
+  assignee?: { id?: string; name: string } | string;
   tags?: string[];
   createdAt: number;
   updatedAt: number;
 }
 
-export type BoardData = {
+// Board data structure for Kanban columns
+export interface BoardData {
   todo: Task[];
   inprogress: Task[];
   done: Task[];
-};
+}
+
+// --- Project types ---
+export interface Project {
+  id: string;
+  name: string;
+  description?: string;
+  owner: string;
+  members: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
