@@ -8,7 +8,16 @@ export function useTasks() {
   useEffect(() => {
     setTimeout(() => {
       setTasks([
-        { id: "a1", title: "Sample task", priority: "medium" },
+        {
+          id: "a1",
+          projectId: "demo",
+          title: "Sample task",
+          description: "This is a placeholder task",
+          status: "todo",
+          priority: "medium",
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
       ]);
       setLoading(false);
     }, 300);
