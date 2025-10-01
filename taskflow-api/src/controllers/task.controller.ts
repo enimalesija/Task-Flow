@@ -12,14 +12,23 @@ export async function getTasks(req: AuthRequest, res: Response) {
     const { projectId } = req.query as { projectId?: string };
     if (!projectId) return res.status(400).json({ error: "projectId is required" });
 
-    // ✅ check membership
     const project = await Project.findOne({
       _id: projectId,
       $or: [{ owner: userId }, { members: userId }],
     });
     if (!project) return res.status(403).json({ error: "Not authorized for this project" });
 
-    const tasks = await Task.find({ project: projectId }).sort({ updatedAt: -1 });
+    const task = await Task.create({
+  project: projectId,
+  title: title.trim(),
+  description: description?.trim(),
+  status: status || "todo",
+  priority: priority || "medium",
+  dueDate: dueDate ? new Date(dueDate) : undefined,
+  assignee: typeof assignee === "object" ? assignee.name : assignee,
+  tags: Array.isArray(tags) ? tags : [],
+});
+
 
     return res.json(tasks.map(normalize));
   } catch (err: any) {
