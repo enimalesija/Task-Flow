@@ -1,10 +1,5 @@
-// src/utils/api.ts
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
-// Always use VITE_API_URL from env in production
-// Fallback to localhost in dev
-const API_URL: string = import.meta.env.VITE_API_URL ?? "http://localhost:4000/api";
-
-// --- Helper: build headers with JWT ---
 function headers() {
   const token = localStorage.getItem("tf_token");
   return {
@@ -13,7 +8,6 @@ function headers() {
   };
 }
 
-// --- Generic fetch wrapper ---
 async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
     let msg = "";
@@ -59,9 +53,7 @@ async function del<T = any>(path: string): Promise<T> {
   return handle<T>(res);
 }
 
-// ----------------------
-// AUTH
-// ----------------------
+// ---------------------- AUTH ----------------------
 export async function loginUser(email: string, password: string) {
   const res = await post<{ accessToken: string; user: any }>("/auth/login", {
     email,
@@ -89,32 +81,24 @@ export function logoutUser() {
   localStorage.removeItem("tf_token");
 }
 
-// ----------------------
-// PROJECTS
-// ----------------------
+// ---------------------- PROJECTS ----------------------
 export async function listProjects() {
   return get<any[]>("/projects");
 }
-
 export async function createProject(data: { name: string; description?: string }) {
   return post<any>("/projects", data);
 }
-
 export async function deleteProject(id: string) {
   return del<any>(`/projects/${id}`);
 }
-
 export async function addProjectMember(projectId: string, memberId: string) {
   return post<any>(`/projects/${projectId}/add-member`, { memberId });
 }
 
-// ----------------------
-// TASKS
-// ----------------------
+// ---------------------- TASKS ----------------------
 export async function listTasks(projectId: string) {
   return get<any[]>(`/tasks?projectId=${projectId}`);
 }
-
 export async function createTask(data: {
   projectId: string;
   title: string;
@@ -127,11 +111,9 @@ export async function createTask(data: {
 }) {
   return post<any>("/tasks", data);
 }
-
 export async function updateTask(id: string, patchData: any) {
   return patch<any>(`/tasks/${id}`, patchData);
 }
-
 export async function deleteTask(id: string) {
   return del<any>(`/tasks/${id}`);
 }
