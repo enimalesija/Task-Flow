@@ -1,4 +1,3 @@
-// src/components/Sidebar.tsx
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { useTasks } from "../context/TasksContext";
@@ -64,10 +63,7 @@ export default function Sidebar() {
             className="side-subtitle"
             onClick={() => setProjOpen((v) => !v)}
           >
-            <i
-              className="fas fa-folder-open icon"
-              style={{ color: "#f8b73eff" }}
-            />{" "}
+            <i className="fas fa-folder-open icon" style={{ color: "#f8b73e" }} />{" "}
             Projects
             <span className="muted" style={{ marginLeft: "auto" }}>
               {projOpen ? "▾" : "▸"}
@@ -85,9 +81,7 @@ export default function Sidebar() {
                 projects.map((p) => (
                   <div
                     key={p.id}
-                    className={`side-link ${
-                      current?.id === p.id ? "active" : ""
-                    }`}
+                    className={`side-link ${current?.id === p.id ? "active" : ""}`}
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
@@ -103,10 +97,7 @@ export default function Sidebar() {
                         border: "none",
                       }}
                     >
-                      <i
-                        className="fas fa-folder icon"
-                        style={{ color: "#0b90e9ff" }}
-                      />{" "}
+                      <i className="fas fa-folder icon" style={{ color: "#0b90e9" }} />{" "}
                       <span className="project-name">{p.name}</span>
                     </button>
                     <button
@@ -122,49 +113,50 @@ export default function Sidebar() {
                         }
                       }}
                     >
-                      <i
-                        className="fas fa-trash icon"
-                        style={{ color: "#f83d3dff" }}
-                      />
+                      <i className="fas fa-trash icon" style={{ color: "#f83d3d" }} />
                     </button>
                   </div>
                 ))}
 
               {/* New Project Button */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginTop: "auto", // 👈 pushes it down
-                    padding: "22px",
-                  }}
-                >
-                  <button
-                    className="ghost small"
-                    onClick={() => setModalOpen(true)}
-                  >
-                    <i
-                      className="fas fa-plus icon"
-                      style={{ color: "#22c55e", marginRight: "8px" }}
-                    />{" "}
-                    New Project
-                  </button>
-                </div>
+              <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>
+                <button className="ghost small" onClick={() => setModalOpen(true)}>
+                  <i className="fas fa-plus icon" style={{ color: "#22c55e", marginRight: "8px" }} />{" "}
+                  New Project
+                </button>
               </div>
+            </div>
+          )}
+        </div>
+
+        {/* Filters */}
+        <div className="side-group">
+          <button
+            className="side-subtitle"
+            onClick={() => setFiltersOpen((v) => !v)}
+          >
+            <i className="fas fa-filter icon" style={{ color: "#22c55e" }} /> Filters
+            <span className="muted" style={{ marginLeft: "auto" }}>
+              {filtersOpen ? "▾" : "▸"}
+            </span>
+          </button>
+
+          {filtersOpen && (
+            <div className="side-list small">
+              {["all", "high", "medium", "low"].map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setFilterPriority(p as any)}
+                  className={`side-link ${filterPriority === p ? "active" : ""}`}
+                >
+                  {p === "all" ? "All Priorities" : `Priority: ${p}`}
+                </button>
+              ))}
             </div>
           )}
         </div>
       </nav>
 
-      {/* Sidebar footer */}
       <div className="side-footer">TaskFlow • v2.0</div>
 
       {/* New Project Modal */}

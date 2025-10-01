@@ -29,6 +29,12 @@ type Ctx = {
   removeTask: (id: string) => Promise<void>;
   moveTask: (id: string, to: Status, toIndex: number) => Promise<void>;
   reorderWithin: (col: Status, fromIndex: number, toIndex: number) => void;
+
+  // 🔥 Added search + filter states
+  search: string;
+  setSearch: (v: string) => void;
+  filterPriority: Priority | "all";
+  setFilterPriority: (v: Priority | "all") => void;
 };
 
 const TasksCtx = createContext<Ctx | null>(null);
@@ -90,12 +96,14 @@ function prepareTaskForApi(
     assignee = { id: input.assignee.id, name: input.assignee.name };
   }
 
-  let dueDate: number | undefined = undefined;
+  // 🔥 Fix dueDate to always be string
+  let dueDate: string | undefined = undefined;
   if (input.dueDate) {
-    dueDate =
-      typeof input.dueDate === "string"
-        ? Date.parse(input.dueDate)
-        : input.dueDate;
+    if (typeof input.dueDate === "number") {
+      dueDate = new Date(input.dueDate).toISOString();
+    } else {
+      dueDate = String(input.dueDate);
+    }
   }
 
   return {
@@ -118,6 +126,10 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(true);
+
+  // NEW states
+  const [search, setSearch] = useState("");
+  const [filterPriority, setFilterPriority] = useState<Priority | "all">("all");
 
   useEffect(() => {
     mounted.current = true;
@@ -157,14 +169,26 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     };
   }, [current?.id]);
 
-  const board = useMemo<Board>(
-    () => ({
-      todo: (tasks || []).filter((t) => t.status === "todo"),
-      inprogress: (tasks || []).filter((t) => t.status === "inprogress"),
-      done: (tasks || []).filter((t) => t.status === "done"),
-    }),
-    [tasks]
-  );
+  const board = useMemo<Board>(() => {
+    let filtered = tasks;
+    if (filterPriority !== "all") {
+      filtered = filtered.filter((t) => t.priority === filterPriority);
+    }
+    if (search.trim()) {
+      const s = search.toLowerCase();
+      filtered = filtered.filter(
+        (t) =>
+          t.title.toLowerCase().includes(s) ||
+          t.description?.toLowerCase().includes(s)
+      );
+    }
+
+    return {
+      todo: (filtered || []).filter((t) => t.status === "todo"),
+      inprogress: (filtered || []).filter((t) => t.status === "inprogress"),
+      done: (filtered || []).filter((t) => t.status === "done"),
+    };
+  }, [tasks, search, filterPriority]);
 
   async function reload() {
     if (!current?.id) {
@@ -179,7 +203,6 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     input: Partial<Task> & { title: string; status?: Status }
   ) {
     if (!current?.id) throw new Error("No project selected");
-
     const body = { projectId: current.id, ...prepareTaskForApi(input) };
     const created = await apiCreateTask(body);
     setTasks((prev) => [normalizeTask(created), ...prev]);
@@ -188,16 +211,13 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
   async function updateTask(id: string, patch: Partial<Task>) {
     const existing = tasks.find((t) => t.id === id);
     if (!existing) return;
-
     const merged: Partial<Task> & { title: string } = {
       ...existing,
       ...patch,
       title: patch.title ?? existing.title,
     };
-
     const body = prepareTaskForApi(merged);
     const updated = await apiUpdateTask(id, body);
-
     const nt = normalizeTask(updated);
     setTasks((prev) => prev.map((t) => (t.id === id ? nt : t)));
   }
@@ -258,6 +278,10 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
         removeTask,
         moveTask,
         reorderWithin,
+        search,
+        setSearch,
+        filterPriority,
+        setFilterPriority,
       }}
     >
       {children}

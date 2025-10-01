@@ -11,8 +11,9 @@
     "jsx": "react-jsx",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "types": ["react", "react-dom"],
     "noEmit": true
   },
-  "include": ["src"],
+  "include": ["src", "vite-env.d.ts"],
   "exclude": ["node_modules"]
 }

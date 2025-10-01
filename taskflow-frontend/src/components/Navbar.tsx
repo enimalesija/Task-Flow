@@ -1,4 +1,3 @@
-import { NavLink } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { useTasks } from "../context/TasksContext";
 import { useAuth } from "../context/AuthContext";
@@ -6,15 +5,7 @@ import { useAuth } from "../context/AuthContext";
 export default function Navbar() {
   const { mode, toggle } = useTheme();
   const { logout, user } = useAuth();
-
-  // Make Navbar resilient if TasksContext isn’t mounted in some routes
-  let search = "";
-  let setSearch = (_v: string) => {};
-  try {
-    const t = useTasks();
-    search = t.search;
-    setSearch = t.setSearch;
-  } catch {}
+  const { search, setSearch } = useTasks();
 
   return (
     <header className="navbar">
@@ -24,8 +15,16 @@ export default function Navbar() {
         <span>TaskFlow</span>
       </div>
 
-      {/* Navigation + Search */}
-     
+      {/* Search bar */}
+      <div className="nav-search" style={{ flex: 1, margin: "0 1rem" }}>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search tasks..."
+          className="search-input"
+        />
+      </div>
 
       {/* User + Actions */}
       <div className="nav-actions" style={{ display: "flex", gap: 8, alignItems: "center" }}>
