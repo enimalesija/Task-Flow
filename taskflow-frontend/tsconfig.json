@@ -1,20 +1,24 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["DOM", "ES2020"],
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "jsx": "react-jsx",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "ESNext"],
+    "allowJs": false,
+    "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "types": ["vite/client", "react", "react-dom"]
+
+    // 🔑 These two lines fix JSX errors
+    "jsx": "react-jsx",
+    "types": ["react", "react-dom"]
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
