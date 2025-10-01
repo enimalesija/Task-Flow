@@ -1,7 +1,17 @@
-// src/types.ts
+// Unified types for TaskFlow
 
 export type Status = "todo" | "inprogress" | "done";
 export type Priority = "high" | "medium" | "low";
+
+export interface Project {
+  id: string;
+  name: string;
+  description?: string;
+  owner: string;
+  members: string[];
+  createdAt: number;
+  updatedAt: number;
+}
 
 export interface Task {
   id: string;
@@ -11,15 +21,14 @@ export interface Task {
   status: Status;
   priority: Priority;
   dueDate?: number;
-  assignee?: { id?: string; name: string } | string;
+  assignee?: string | { id?: string; name: string };
   tags?: string[];
   createdAt: number;
   updatedAt: number;
 }
 
-// ✅ BoardData type
-export interface BoardData {
+export type BoardData = {
   todo: Task[];
   inprogress: Task[];
   done: Task[];
-}
+};
