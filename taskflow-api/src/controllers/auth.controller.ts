@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import { User } from "../models/User";
+import User from "../models/User"; // ✅ FIXED
 import { RefreshToken } from "../models/RefreshToken";
 
 // ------------------ Config ------------------
@@ -46,7 +46,6 @@ function setRtCookie(res: Response, token: string) {
 export async function signup(req: Request, res: Response) {
   try {
     const { name, email, password } = req.body;
-
     if (!name || !email || !password) {
       return res.status(400).json({ error: "All fields required" });
     }
@@ -84,7 +83,8 @@ export async function login(req: Request, res: Response) {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: "Email and password required" });
 
-    const user = await User.findOne({ email }).lean();
+    // ❌ don’t use .lean() — keep Mongoose doc to access passwordHash
+    const user = await User.findOne({ email });
     if (!user || !user.passwordHash) {
       return res.status(400).json({ error: "Invalid credentials" });
     }
