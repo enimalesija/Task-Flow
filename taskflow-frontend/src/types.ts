@@ -1,7 +1,9 @@
+// src/types.ts
+
 export type Status = "todo" | "inprogress" | "done";
 export type Priority = "high" | "medium" | "low";
 
-export type Task = {
+export interface Task {
   id: string;
   projectId: string;
   title: string;
@@ -9,18 +11,15 @@ export type Task = {
   status: Status;
   priority: Priority;
   dueDate?: number;
-  assignee?: { id?: string; name?: string } | string | null;
+  assignee?: { id?: string; name: string } | string;
   tags?: string[];
   createdAt: number;
   updatedAt: number;
-};
+}
 
-export type Project = {
-  id: string;
-  name: string;
-  description?: string;
-  owner?: string;
-  members?: string[];
-  createdAt: Date;
-  updatedAt: Date;
-};
+// ✅ BoardData type
+export interface BoardData {
+  todo: Task[];
+  inprogress: Task[];
+  done: Task[];
+}
