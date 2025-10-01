@@ -1,3 +1,4 @@
+// src/context/TasksContext.tsx
 import {
   createContext,
   useContext,
@@ -30,7 +31,6 @@ type Ctx = {
   moveTask: (id: string, to: Status, toIndex: number) => Promise<void>;
   reorderWithin: (col: Status, fromIndex: number, toIndex: number) => void;
 
-  // 🔥 Added search + filter states
   search: string;
   setSearch: (v: string) => void;
   filterPriority: Priority | "all";
@@ -57,13 +57,6 @@ function normalizeTask(t: any): Task {
       ? t.updatedAt
       : Date.now();
 
-  let assignee: Task["assignee"] = undefined;
-  if (typeof t.assignee === "string") {
-    assignee = { name: t.assignee };
-  } else if (t.assignee && typeof t.assignee === "object") {
-    assignee = { id: t.assignee.id, name: t.assignee.name ?? "" };
-  }
-
   const dueDate =
     t.dueDate != null
       ? typeof t.dueDate === "string"
@@ -71,12 +64,21 @@ function normalizeTask(t: any): Task {
         : Number(t.dueDate)
       : undefined;
 
+  let assignee: Task["assignee"];
+  if (typeof t.assignee === "string") {
+    assignee = { name: t.assignee };
+  } else if (t.assignee && typeof t.assignee === "object") {
+    assignee = { id: t.assignee.id, name: t.assignee.name ?? "" };
+  } else {
+    assignee = undefined;
+  }
+
   return {
     id: t.id || t._id,
     projectId: t.projectId || t.project,
     title: t.title,
     description: t.description ?? "",
-    status: t.status,
+    status: (t.status ?? "todo") as Status,
     priority: (t.priority ?? "medium") as Priority,
     dueDate,
     assignee,
@@ -96,7 +98,6 @@ function prepareTaskForApi(
     assignee = { id: input.assignee.id, name: input.assignee.name };
   }
 
-  // 🔥 Fix dueDate to always be string
   let dueDate: string | undefined = undefined;
   if (input.dueDate) {
     if (typeof input.dueDate === "number") {
@@ -127,7 +128,6 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(true);
 
-  // NEW states
   const [search, setSearch] = useState("");
   const [filterPriority, setFilterPriority] = useState<Priority | "all">("all");
 
