@@ -1,3 +1,4 @@
+// src/controllers/task.controller.ts
 import { Response } from "express";
 import { Task } from "../models/Task";
 import { Project } from "../models/Project";
@@ -12,24 +13,14 @@ export async function getTasks(req: AuthRequest, res: Response) {
     const { projectId } = req.query as { projectId?: string };
     if (!projectId) return res.status(400).json({ error: "projectId is required" });
 
+    // ✅ check membership
     const project = await Project.findOne({
       _id: projectId,
       $or: [{ owner: userId }, { members: userId }],
     });
     if (!project) return res.status(403).json({ error: "Not authorized for this project" });
 
-    const task = await Task.create({
-  project: projectId,
-  title: title.trim(),
-  description: description?.trim(),
-  status: status || "todo",
-  priority: priority || "medium",
-  dueDate: dueDate ? new Date(dueDate) : undefined,
-  assignee: typeof assignee === "object" ? assignee.name : assignee,
-  tags: Array.isArray(tags) ? tags : [],
-});
-
-
+    const tasks = await Task.find({ project: projectId }).sort({ updatedAt: -1 });
     return res.json(tasks.map(normalize));
   } catch (err: any) {
     return res.status(400).json({ error: err?.message || "Failed to fetch tasks" });
@@ -55,14 +46,15 @@ export async function createTask(req: AuthRequest, res: Response) {
     });
     if (!project) return res.status(403).json({ error: "Not authorized for this project" });
 
+    // ✅ create the task
     const task = await Task.create({
       project: projectId,
       title: title.trim(),
       description: description?.trim(),
       status: status || "todo",
       priority: priority || "medium",
-      dueDate,
-      assignee,
+      dueDate: dueDate ? new Date(dueDate) : undefined,
+      assignee: typeof assignee === "object" ? assignee.name : assignee,
       tags: Array.isArray(tags) ? tags : [],
     });
 
@@ -80,7 +72,6 @@ export async function updateTask(req: AuthRequest, res: Response) {
 
     const { id } = req.params;
 
-    // ✅ check membership through task → project
     const task = await Task.findById(id);
     if (!task) return res.status(404).json({ error: "Task not found" });
 
