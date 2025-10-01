@@ -1,14 +1,23 @@
+// src/components/TaskCard.tsx
 import type { Task } from "../types";
+
+interface TaskCardProps {
+  task: Task;
+  onEdit: () => void;
+  onDelete: () => void;
+  selected?: boolean;
+  onSelect?: (checked: boolean) => void;
+  due?: "none" | "overdue" | "soon";
+}
 
 export default function TaskCard({
   task,
   onEdit,
   onDelete,
-}: {
-  task: Task;
-  onEdit: () => void;
-  onDelete: () => void;
-}) {
+  selected = false,
+  onSelect,
+  due = "none",
+}: TaskCardProps) {
   // Resolve assignee name
   const assigneeName =
     typeof task.assignee === "string"
@@ -21,11 +30,21 @@ export default function TaskCard({
     : "";
 
   return (
-    <div className="card">
+    <div className={`card ${due !== "none" ? `due-${due}` : ""}`}>
       {/* Top bar */}
       <div className="card-head">
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {/* Selection checkbox */}
+          {onSelect && (
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={(e) => onSelect(e.target.checked)}
+            />
+          )}
+
           <i className="fa-solid fa-grip-vertical icon muted" aria-hidden />
+
           {/* Priority Badge */}
           <span
             className={`tag priority-${task.priority}`}
@@ -43,6 +62,7 @@ export default function TaskCard({
             {task.priority}
           </span>
         </div>
+
         <div style={{ display: "flex", gap: 8 }}>
           <button className="ghost small" onClick={onEdit} title="Edit">
             <i className="fa-solid fa-pen-to-square icon" aria-hidden /> Edit
