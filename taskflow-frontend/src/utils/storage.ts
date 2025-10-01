@@ -18,7 +18,6 @@ export function saveBoard(data: BoardData) {
   }
 }
 
-// Theme helpers for ThemeContext
 export function loadTheme(): "light" | "dark" | null {
   return (localStorage.getItem("theme") as "light" | "dark") ?? null;
 }
