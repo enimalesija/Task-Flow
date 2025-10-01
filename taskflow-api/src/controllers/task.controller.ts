@@ -1,6 +1,6 @@
 import { Response } from "express";
-import Task from "../models/Task";       // ✅ default import (not { Task })
-import Project from "../models/Project"; // ✅ default import
+import { Task } from "../models/Task";
+import { Project } from "../models/Project";
 import { AuthRequest } from "../middleware/auth";
 
 /** GET /api/tasks?projectId=... */
