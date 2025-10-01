@@ -30,7 +30,11 @@ export default function TaskCard({
     : "";
 
   return (
-    <div className={`card ${due !== "none" ? `due-${due}` : ""}`}>
+    <div
+      className={`card ${
+        due === "overdue" ? "due-overdue" : due === "soon" ? "due-soon" : ""
+      }`}
+    >
       {/* Top bar */}
       <div className="card-head">
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -103,13 +107,15 @@ export default function TaskCard({
       )}
 
       {/* Tags */}
-      <div className="tags">
-        {(task.tags ?? []).map((t) => (
-          <span key={t} className="tag">
-            <i className="fa-solid fa-tag icon sm" aria-hidden /> {t}
-          </span>
-        ))}
-      </div>
+      {!!task.tags?.length && (
+        <div className="tags">
+          {task.tags.map((t) => (
+            <span key={t} className="tag">
+              <i className="fa-solid fa-tag icon sm" aria-hidden /> {t}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
