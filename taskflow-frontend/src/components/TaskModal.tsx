@@ -1,5 +1,14 @@
+// src/components/TaskModal.tsx
 import { useEffect, useState } from "react";
 import type { Status, Task, Priority } from "../types";
+
+interface TaskModalProps {
+  open: boolean;
+  onClose: () => void;
+  onCreate: (t: Partial<Task> & { title: string; status?: Status }) => void;
+  onUpdate: (id: string, patch: Partial<Task>) => void;
+  task?: Task;
+}
 
 export default function TaskModal({
   open,
@@ -7,28 +16,15 @@ export default function TaskModal({
   onCreate,
   onUpdate,
   task,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onCreate: (t: Partial<Task> & { title: string; status?: Status }) => void;
-  onUpdate: (id: string, patch: Partial<Task>) => void;
-  task?: Task;
-}) {
-  const [title, setTitle] = useState(task?.title ?? "");
-  const [description, setDescription] = useState(task?.description ?? "");
-  const [status, setStatus] = useState<Status>(task?.status ?? "todo");
-  const [priority, setPriority] = useState<Priority>(
-    task?.priority ?? "medium"
-  );
-  const [assignee, setAssignee] = useState(
-    typeof task?.assignee === "string"
-      ? task.assignee
-      : task?.assignee?.name ?? ""
-  );
-  const [dueDate, setDueDate] = useState(
-    task?.dueDate ? new Date(task.dueDate).toISOString().split("T")[0] : ""
-  );
+}: TaskModalProps) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState<Status>("todo");
+  const [priority, setPriority] = useState<Priority>("medium");
+  const [assignee, setAssignee] = useState<string>("");
+  const [dueDate, setDueDate] = useState<string>("");
 
+  // Reset state when opening or task changes
   useEffect(() => {
     if (task) {
       setTitle(task.title);
@@ -38,7 +34,7 @@ export default function TaskModal({
       setAssignee(
         typeof task.assignee === "string"
           ? task.assignee
-          : task?.assignee?.name ?? ""
+          : task.assignee?.name ?? ""
       );
       setDueDate(
         task.dueDate ? new Date(task.dueDate).toISOString().split("T")[0] : ""
@@ -64,12 +60,15 @@ export default function TaskModal({
       description: description.trim(),
       status,
       priority,
-      assignee: assignee ? { name: assignee } : null,
+      assignee: assignee ? { name: assignee } : undefined,
       dueDate: dueDate ? new Date(dueDate).getTime() : undefined,
     };
 
-    if (task) onUpdate(task.id, patch);
-    else onCreate(patch as any);
+    if (task) {
+      onUpdate(task.id, patch);
+    } else {
+      onCreate(patch as any);
+    }
 
     onClose();
   }
@@ -77,10 +76,7 @@ export default function TaskModal({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h3
-          className="title"
-          style={{ display: "flex", alignItems: "center", gap: 8 }}
-        >
+        <h3 className="title" style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <i className="fa-solid fa-square-pen icon" aria-hidden />
           {task ? "Edit Task" : "New Task"}
         </h3>
@@ -99,8 +95,7 @@ export default function TaskModal({
 
           {/* Description */}
           <label className="label" style={{ marginTop: 10 }}>
-            <i className="fa-solid fa-align-left icon sm" aria-hidden />{" "}
-            Description
+            <i className="fa-solid fa-align-left icon sm" aria-hidden /> Description
           </label>
           <textarea
             className="textarea"
@@ -119,8 +114,7 @@ export default function TaskModal({
           >
             <div>
               <label className="label">
-                <i className="fa-solid fa-layer-group icon sm" aria-hidden />{" "}
-                Status
+                <i className="fa-solid fa-layer-group icon sm" aria-hidden /> Status
               </label>
               <select
                 className="select"
@@ -134,8 +128,7 @@ export default function TaskModal({
             </div>
             <div>
               <label className="label">
-                <i className="fa-solid fa-signal icon sm" aria-hidden />{" "}
-                Priority
+                <i className="fa-solid fa-signal icon sm" aria-hidden /> Priority
               </label>
               <select
                 className="select"
@@ -171,8 +164,7 @@ export default function TaskModal({
             </div>
             <div>
               <label className="label">
-                <i className="fa-solid fa-calendar-day icon sm" aria-hidden />{" "}
-                Due Date
+                <i className="fa-solid fa-calendar-day icon sm" aria-hidden /> Due Date
               </label>
               <input
                 type="date"
