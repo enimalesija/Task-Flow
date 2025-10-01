@@ -6,10 +6,11 @@ import MainLayout from "./layouts/MainLayout";
 import Dashboard from "./pages/Dashboard";
 import LoginPage from "./pages/Login";
 import SignupPage from "./pages/Signup";
+import type { ReactNode } from "react"; // ✅ import ReactNode
 
-function PrivateRoute({ children }: { children: JSX.Element }) {
+function PrivateRoute({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  return user ? children : <Navigate to="/login" replace />;
+  return <>{user ? children : <Navigate to="/login" replace />}</>;
 }
 
 export default function App() {
